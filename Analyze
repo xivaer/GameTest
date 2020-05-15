@@ -1,0 +1,154 @@
+private IEnumerator Analyze()
+{
+    List<PokerHand> result;
+    List<PokerHand> handCards = null;
+
+    int _JokerCount = JokerCount;
+
+    cards.Sort();
+
+    switch (PokerHand.CombinationType.Invalid)
+    {
+        case PokerHand.CombinationType.Invalid:
+            goto case PokerHand.CombinationType.TwoPair;
+        case PokerHand.CombinationType.TwoPair:
+            result = TwoPair.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.TwoPair;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JTriple;
+            else
+                goto case PokerHand.CombinationType.Triple;
+        case PokerHand.CombinationType.JTriple:
+            result = JTriple.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JTriple;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.Triple;
+        case PokerHand.CombinationType.Triple:
+            result = Triple.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.Triple;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JStraight;
+            else
+                goto case PokerHand.CombinationType.Straight;
+        case PokerHand.CombinationType.JStraight:
+            result = JStraight.Instance.LazyEvaluator(cards, false, null, true);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JStraight;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.Straight;
+        case PokerHand.CombinationType.Straight:
+            result = Straight.Instance.LazyEvaluator(cards, false, null, true);
+            if (result.Count > 0) comb = PokerHand.CombinationType.Straight;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JFlush;
+            else
+                goto case PokerHand.CombinationType.Flush;
+        case PokerHand.CombinationType.JFlush:
+            JokerCount = _JokerCount;
+            result = JFlush.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JFlush;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.Flush;
+        case PokerHand.CombinationType.Flush:
+            JokerCount = _JokerCount;
+            result = Flush.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.Flush;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JFullHouse;
+            else
+                goto case PokerHand.CombinationType.FullHouse;
+        case PokerHand.CombinationType.JFullHouse:
+            JokerCount = _JokerCount;
+            result = JFullHouse.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JFullHouse;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.FullHouse;
+        case PokerHand.CombinationType.FullHouse:
+            JokerCount = _JokerCount;
+            result = FullHouse.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.FullHouse;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JFourOfAKind;
+            else
+                goto case PokerHand.CombinationType.FourOfAKind;
+        case PokerHand.CombinationType.JFourOfAKind:
+            JokerCount = _JokerCount;
+            result = JFourOfAKind.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JFourOfAKind;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.FourOfAKind;
+        case PokerHand.CombinationType.FourOfAKind:
+            JokerCount = _JokerCount;
+            result = FourOfAKind.Instance.LazyEvaluator(cards);
+            if (result.Count > 0) comb = PokerHand.CombinationType.FourOfAKind;
+            if (result.Count > 0) handCards = result;
+
+            if (JokerCount > 0)
+                goto case PokerHand.CombinationType.JStraightFlush;
+            else
+                goto case PokerHand.CombinationType.StraightFlush;
+        case PokerHand.CombinationType.JStraightFlush:
+            JokerCount = _JokerCount;
+            result = JStraightFlush.Instance.LazyEvaluator(cards, false, null, true);
+            if (result.Count > 0) comb = PokerHand.CombinationType.JStraightFlush;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.StraightFlush;
+        case PokerHand.CombinationType.StraightFlush:
+            JokerCount = _JokerCount;
+            result = StraightFlush.Instance.LazyEvaluator(cards, false, null, true);
+            if (result.Count > 0) comb = PokerHand.CombinationType.StraightFlush;
+            if (result.Count > 0) handCards = result;
+
+            goto case PokerHand.CombinationType.RoyalFlush;
+        case PokerHand.CombinationType.RoyalFlush:
+            JokerCount = _JokerCount;
+            result = RoyalFlush.Instance.LazyEvaluator(cards, false, null, true);
+            result = result.FindAll(a => a.Combination == PokerHand.CombinationType.RoyalFlush);
+            if (result.Count > 0) comb = PokerHand.CombinationType.RoyalFlush;
+
+            yield return null;
+            break;
+    }
+    
+    StartCoroutine("Auto");
+}
+
+private IEnumerator Auto()
+{
+    while (SaveGameInfo.Instance.Auto)
+    {
+        yield return new WaitForSeconds(1f);
+        BUTTONBet.onClick.Invoke();
+    }
+}
+
+public void ButtonAutoOn()
+{
+    if (SaveGameInfo.Instance.Auto == false)
+    {
+        SaveGameInfo.Instance.Auto = true;
+    }
+}
+
+public void ButtonAutoOff()
+{
+    if (SaveGameInfo.Instance.Auto == true)
+    {
+        SaveGameInfo.Instance.Auto = false;
+    }
+}
